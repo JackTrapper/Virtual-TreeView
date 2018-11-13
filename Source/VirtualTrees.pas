@@ -50,7 +50,7 @@ unit VirtualTrees;
 interface
 
 {$booleval off} // Use fastest possible boolean evaluation
- 
+
 {.$define TntSupport} // Added by Igor Afanasyev to support unicode-aware inplace editors. This implementation uses
                       // Troy Wolbrink's TNT controls, meanwhile available as TMS Unicode components
 
@@ -97,7 +97,10 @@ const
 type
   UnicodeString = WideString;
   RawByteString = AnsiString;
-  PByte = PAnsiChar;
+
+// They did this because older compilers don't support pointer arithmetic on PByte.
+// Moved down to the implementation section to avoid collisions [Avatar-20140717]
+//  PByte = PAnsiChar; PByte is defined in Windows.pas as ^Byte
 {$ifend}
 
 {$if CompilerVersion < 18}
@@ -4085,6 +4088,14 @@ uses
   StrUtils,
   VTAccessibilityFactory, GraphUtil;  // accessibility helper class
 
+
+{$if CompilerVersion < 20}
+type
+// They did this because older compilers don't support pointer arithmetic on PByte.
+// This was originally declared in the interface section above [Avatar-20140717]
+	PByte = PAnsiChar;
+{$ifend}
+  
 resourcestring
   // Localizable strings.
   SEditLinkIsNil = 'Edit link must not be nil.';
